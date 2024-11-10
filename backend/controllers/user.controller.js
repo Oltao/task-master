@@ -27,7 +27,7 @@ export const login = async (req, res) => {
     const token = generateToken(user._id);
 
     return res
-      .cookie("token", token, cookieOptions)
+      .cookie("_taskmasteruser", token, cookieOptions)
       .status(200)
       .json({ message: "Login successful" });
   } catch (error) {
@@ -36,19 +36,23 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-  const { fullName: name, username, password } = req.body;
+  const { fullName, username, password } = req.body;
 
   try {
-    const existingUser = await User.findOne({ username });
+    const userExists = await User.findOne({ username });
 
-    if (existingUser) {
+    if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = await User.create({ name, username, password });
+    if (!fullName || !username || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    };
 
-    res.status(201).json(user);
+    const newUser = await User.create({ fullName, username, password });
+
+    return res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: "Server error" });
   }
 };

@@ -21,7 +21,7 @@ export const createTask = async (req, res) => {
     if (!task) {
       return res
         .status(500)
-        .json({ message: "Error occurred while creating task"});
+        .json({ message: "Error occurred while creating task" });
     }
 
     return res.status(201).json(task);
@@ -39,11 +39,32 @@ export const createTask = async (req, res) => {
   }
 };
 export const getTasks = async (req, res) => {
-  try {
-    const tasks = await Task.find();
+  const {
+    priority: priorityFilter,
+    deadline: deadlineFilter,
+    search: searchQuery,
+  } = req.query;
 
+  const filter = { user: req.user };
+
+  if (priorityFilter) {
+    filter.priority = priorityFilter;
+  }
+
+  if (deadlineFilter) {
+    filter.deadline = deadlineFilter;
+  }
+
+  if (searchQuery) {
+    const searchRegex = new RegExp(searchQuery, "i");
+    filter.$or = [{ title: searchRegex }, { description: searchRegex }];
+  }
+
+  try {
+    const tasks = await Task.find(filter);
     res.status(200).json(tasks);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error", reason: error.message });
   }
 };
@@ -106,3 +127,7 @@ export const deleteTask = async (req, res) => {
     res.status(500).json({ message: "Server error", reason: error.message });
   }
 };
+
+// export const filterAndSearchTasks = async (req, res) => {
+//   console.log(req.params);
+// };

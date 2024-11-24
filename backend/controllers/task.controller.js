@@ -16,8 +16,6 @@ export const createTask = async (req, res) => {
       priority,
     });
 
-    console.log(task);
-
     if (!task) {
       return res
         .status(500)
@@ -33,9 +31,7 @@ export const createTask = async (req, res) => {
     }
 
     console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Server error", reason: error.message });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 export const getTasks = async (req, res) => {
@@ -65,7 +61,7 @@ export const getTasks = async (req, res) => {
     res.status(200).json(tasks);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error", reason: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 export const getTask = async (req, res) => {
@@ -127,7 +123,3 @@ export const deleteTask = async (req, res) => {
     res.status(500).json({ message: "Server error", reason: error.message });
   }
 };
-
-// export const filterAndSearchTasks = async (req, res) => {
-//   console.log(req.params);
-// };
